@@ -17,12 +17,15 @@ export default function Home() {
         />
       </header>
       <main className="grid grid-cols-2 gap-4 row-start-2">
-        <a href="/webilling" className="flex flex-col items-center h-full w-full aspect-square p-5">
+        <Button
+          variant="ghost"
+          className="flex flex-col items-center h-full w-full aspect-square p-5"
+        >
           <CircleGauge style={{ width: "50px !important", height: "50px !important" }} />
           <span className="text-sm mt-2 flex wrap">
             Water & Electricity Bill
           </span>
-        </a>
+        </Button>
         <Button disabled
           variant="ghost"
           className="flex flex-col items-center h-full w-full aspect-square p-5"
