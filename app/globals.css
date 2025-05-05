@@ -120,3 +120,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+.pai-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: var(--card);
+  color: var(--card-foreground);
+}
