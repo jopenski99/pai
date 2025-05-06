@@ -13,7 +13,6 @@ export const waterBillingTable = {
 
   isInitialized: async () => {
     const db = await openDB();
-    console.log(db)
     return { isInit: db.objectStoreNames.contains(waterBillingTable.name), dbIn: db };
   },
   init: (db) => {
@@ -21,11 +20,29 @@ export const waterBillingTable = {
       throw new Error(`Object store ${waterBillingTable.name} does not exist`);
     }
   },
+  getLatest: (db) => {
+    const transaction = db.transaction(waterBillingTable.name, 'readonly');
+    const store = transaction.objectStore(waterBillingTable.name);
+    const request = store.openCursor(null, 'prev');
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result ? request.result.value : null);
+      request.onerror = () => reject(request.error);
+    });
+  },
   create: (db, data) => {
     console.log(data)
+    let waterRate
+    let waterRateString
+    if (data.total_amount && data.water_consumed) {
+      waterRate = parseFloat(data.total_amount) / parseFloat(data.water_consumed);
+      waterRateString = isNaN(waterRate) ? '' : waterRate.toFixed(2);
+    }
+
+    let newData = {...data, water_rate: waterRateString};
+    console.log(newData)
     const transaction = db.transaction(waterBillingTable.name, 'readwrite');
     const store = transaction.objectStore(waterBillingTable.name);
-    const request = store.add(data);
+    const request = store.add(newData);
     return new Promise((resolve, reject) => {
       request.onsuccess = () => resolve(data);
       request.onerror = () => reject(request.error);

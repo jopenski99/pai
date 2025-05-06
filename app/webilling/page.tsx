@@ -12,18 +12,30 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { BadgeX } from "lucide-react";
 
 import WaterBillCard from "@/components/pui/water-bill-card";
+import EnergyBillCard from "@/components/pui/energy-bill-card";
 
 import React, { useState, useEffect, useRef } from 'react';
 
+interface iRoom {
+  room_no: string | undefined;
+  renter_name: string | undefined;
+}
+
+interface WebillingProps {
+  rooms: iRoom[]
+}
 export default function Webilling() {
+
   const [initialized, setInitialized] = useState(false);
-  const [roomsList, setRooms] = useState([]);
+  const [roomsList, setRooms] = useState<iRoom[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newRoom, setNewRoom] = useState({ room_no: '', renter_name: '' });
+  const [newRoom, setNewRoom] = useState<iRoom | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const newRoomRef = useRef(newRoom);
+
+  const newRoomRef = useRef<iRoom>({} as iRoom);
 
   useEffect(() => {
     (async () => {
@@ -32,8 +44,24 @@ export default function Webilling() {
     })();
   }, []);
 
-  const handleDelete = (roomNo) => {
-    // Handle deletion logic here
+  const handleDelete = (roomNo: string) => {
+    setIsLoading(true);
+    const confirmed = window.confirm(`Are you sure you want to delete room ${roomNo}?`);
+    if (confirmed) {
+      (async () => {
+        try {
+          let db = await rooms.isInitialized();
+          await rooms.delete(db.dbIn, roomNo);
+          setRooms(await rooms.getAll(db.dbIn));
+        } catch (error) {
+          console.error('Failed to delete room:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+    } else {
+      setIsLoading(false);
+    }
   };
 
   const handleCreate = () => {
@@ -42,18 +70,25 @@ export default function Webilling() {
   };
   const handleSaveRoom = () => {
     setIsLoading(true);
-    (async () => {
-      let db = await rooms.isInitialized();
-      await rooms.create(db.dbIn, newRoomRef.current);
+    try {
+      (async () => {
+        let db = await rooms.isInitialized();
+        console.table(newRoomRef)
+        await rooms.create(db.dbIn, newRoom);
+
+      })();
+    } catch (error) {
+      console.error('Error saving room:', error);
+    }
       setIsLoading(false);
       setIsDialogOpen(false);
-      setNewRoom({ room_no: '', renter_name: '' });
-      setRooms([...roomsList, newRoomRef.current]);
-    })();
-  }
+      setNewRoom({ renter_name:'', room_no: '' }); 
+      setRooms([...roomsList, newRoom]);
+    }
+  
 
   const handleInputChange = (e) => {
-    newRoomRef.current = { ...newRoomRef.current, [e.target.id]: e.target.value };
+    setNewRoom({ ...newRoom, [e.target.id]: e.target.value });
   }
 
   return (
@@ -61,26 +96,26 @@ export default function Webilling() {
       <header className="w-full ">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <WaterBillCard />
-          <WaterBillCard />
+          <EnergyBillCard />
         </div>
         <input
           type="text"
           placeholder="Search..."
-          className="w-full p-4 border border-gray-300 rounded-md"
+          className="w-full p-2  border border-gray-300 rounded-md"
         />
       </header>
-      <main className="w-full grid grid-cols-1 gap-4">
+      <main className="w-full  grid-cols-1 gap-4 h-9/9" style={{height: '450px', paddingBottom: '10px',paddingRight: '5px',overflow: 'auto'}} >
 
 
         {roomsList.map((room, index) => (
-          <div key={index} className="flex justify-between items-center p-4 border border-gray-300 rounded-md">
+          <div key={index} className="h-15 my-2 flex justify-between items-center p-4 border border-gray-300 rounded-md">
             <span>Room {room.room_no} - {room.renter_name}</span>
             <Button
-              variant="destructive"
+              variant="ghost"
               className="text-xs"
               onClick={() => handleDelete(room.room_no)}
             >
-              Delete
+              <BadgeX style={{ width: "25px !important", height: "25px !important", color: "red" }} />
             </Button>
           </div>
         ))}
@@ -99,23 +134,23 @@ export default function Webilling() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+                <Label htmlFor="renter_name" className="text-right">
                   Renter name
                 </Label>
                 <Input
-                  id="name"
-                  value={newRoomRef.current.renter_name}
+                  id="renter_name"
+                  value={newRoom?.renter_name}
                   onChange={handleInputChange}
                   className="col-span-3"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="room_number" className="text-right">
+                <Label htmlFor="room_no" className="text- right">
                   Assigned room number
                 </Label>
                 <Input
-                  id="room_number"
-                  value={newRoomRef.current.room_no}
+                  id="room_no"
+                  value={newRoom?.room_no}
                   onChange={handleInputChange}
                   className="col-span-3"
                 />
@@ -129,7 +164,6 @@ export default function Webilling() {
           </DialogContent>
         </Dialog>
       </footer>
-
     </div>
   );
 }

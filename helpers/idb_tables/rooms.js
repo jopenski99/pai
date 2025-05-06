@@ -5,9 +5,9 @@ export const roomsTable = {
   columns: [
     { name: 'room_no', keypath: 'room_no', options: { unique: true } },
     { name: 'renter_name', keypath: 'renter_name' },
-    { name: 'status', keypath: 'status' },
+   /*  { name: 'status', keypath: 'status' }, */
   ],
-  
+    
   isInitialized: async () => {
     const db = await openDB();
     console.log(db)

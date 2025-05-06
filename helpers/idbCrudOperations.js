@@ -8,20 +8,21 @@ export function openDB() {
         const request = indexedDB.open(dbName, dbVersion);
         request.onerror = () => reject(request.error);
         request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(storeName)) {
-                const store = db.createObjectStore(storeName, { keyPath: 'id', autoIncrement: true });
-                // Create the rooms object store here
-                if (!db.objectStoreNames.contains('rooms')) {
-                    const roomsStore = db.createObjectStore('rooms', { keyPath: 'room_no' });
-                    // Create indexes on the rooms object store here
-                    roomsStore.createIndex('room_no', 'room_no', { unique: true });
-                }
-                if (!db.objectStoreNames.contains('apt_water_bills')) {
-                    const roomsStore = db.createObjectStore('apt_water_bills', { keyPath: 'billing_no' });
-                    // Create indexes on the rooms object store here
-                    roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
-                }
+            const db = event.target.result;     
+            if (!db.objectStoreNames.contains('rooms')) {
+                const roomsStore = db.createObjectStore('rooms', { keyPath: 'room_no' });
+                // Create indexes on the rooms object store here
+                roomsStore.createIndex('room_no', 'room_no', { unique: true });
+            }
+            if (!db.objectStoreNames.contains('apt_water_bills')) {
+                const roomsStore = db.createObjectStore('apt_water_bills', { keyPath: 'billing_no' });
+                // Create indexes on the rooms object store here
+                roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
+            }
+            if (!db.objectStoreNames.contains('apt_electricity_bills')) {
+                const roomsStore = db.createObjectStore('apt_electricity_bills', { keyPath: 'billing_no' });
+                // Create indexes on the rooms object store here
+                roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
             }
         };
         request.onsuccess = () => resolve(request.result);

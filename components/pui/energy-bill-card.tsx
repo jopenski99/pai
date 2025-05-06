@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
-import apt_water_bills from '@/helpers/idb_tables/apt_water_bills';
+import apt_electricity_bills from '@/helpers/idb_tables/apt_electricity_bills';
 import {
   Dialog,
   DialogContent,
@@ -23,10 +23,10 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-export default function WaterBillCard() {
+export default function EnergyBillCard() {
 
   const [currentBill, setCurrentBill] = useState({ month_covered: 'March 2025', total_amount: '1100', date_created: '2025-05-05' });
-  const [newBill, setNewBill] = useState({ billing_no: crypto.randomUUID(), month_covered: '', water_rate: '', water_consumed: '', total_amount: '', date_created: new Date().toISOString().split('T')[0] });
+  const [newBill, setNewBill] = useState({billing_no: crypto.randomUUID(), month_covered: '', consumed_kwh: '', energy_rate: '', total_amount: '', date_created: new Date().toISOString().split('T')[0]});
   // setCurrentBill({date: '2025-05-05', amount: '1100'});
   const [months] = useState(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,31 +38,31 @@ export default function WaterBillCard() {
   const handleSaveBill = () => {
     setIsLoading(true);
     (async () => {
-      if (newBill.total_amount && newBill.water_consumed) {
-        const waterRate = parseFloat(newBill.total_amount) / parseFloat(newBill.water_consumed);
+      if (newBill.total_amount && newBill.consumed_kwh) {
+        const waterRate = parseFloat(newBill.total_amount) / parseFloat(newBill.consumed_kwh);
         const waterRateString = isNaN(waterRate) ? '' : waterRate.toFixed(2);
-        setNewBill(prevState => ({ ...prevState, water_rate: waterRateString }));
+        setNewBill(prevState => ({...prevState, water_rate: waterRateString}));
       }
-      let db = await apt_water_bills.isInitialized();
-      await apt_water_bills.create(db.dbIn, newBill);
-      await fetchLatestBill()
+      let db = await apt_electricity_bills.isInitialized();
+      await apt_electricity_bills.create(db.dbIn, newBill);
+      await fetchLatestBill();
       setIsLoading(false);
       setIsDialogOpen(false);
-      setNewBill({ billing_no: crypto.randomUUID(), month_covered: '', water_rate: '', water_consumed: '', total_amount: '', date_created: new Date().toISOString().split('T')[0] });
+      setNewBill({billing_no: crypto.randomUUID(), month_covered: '', energy_rate: '', consumed_kwh: '', total_amount: '', date_created: new Date().toISOString().split('T')[0] });  
     })();
   }
   const handleInputChange = (e) => {
     setNewBill({ ...newBill, [e.target.id]: e.target.value });
   }
-  useEffect(() => {
-    (async () => {
-      await fetchLatestBill()
-    })();
+   useEffect(() => {
+      (async () => {
+        await fetchLatestBill();
+      })();
   }, []);
   const fetchLatestBill = async () => {
-    let db = await apt_water_bills.isInitialized();
-    let latestBill = await apt_water_bills.getLatest(db.dbIn);
-    setCurrentBill(latestBill);
+    let db = await apt_electricity_bills.isInitialized();
+    let latestBill = await apt_electricity_bills.getLatest(db.dbIn);
+    setCurrentBill(latestBill); 
   }
   const formattedCurrentBill = useMemo(() => {
     if (!currentBill) {
@@ -72,10 +72,10 @@ export default function WaterBillCard() {
   }, [currentBill]);
 
   return (
-    <div className="pai-card p-4 rounded outline">
+    <div className="pai-card p-4 outline">
       <div className="card-body rounded">
-        <h5 className="card-title font-bold text-md ">Latest Water Bill</h5>
-        <p className="card-text ">
+        <h5 className="card-title font-bold text-sm mb-1">Latest Energy Bill</h5>
+        <p className="card-text h-12">
           {formattedCurrentBill}
         </p>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -119,13 +119,13 @@ export default function WaterBillCard() {
               </div>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="water_consumed" className="text-right">
+              <Label htmlFor="consumed_kwh" className="text-right">
                 Consumed
               </Label>
               <Input
-                id="water_consumed"
+                id="consumed_kwh"
                 placeholder={'00000325'}
-                value={newBill.water_consumed}
+                value={newBill.consumed_kwh}
                 onChange={handleInputChange}
                 className="col-span-3"
               />
@@ -143,16 +143,16 @@ export default function WaterBillCard() {
               />
             </div>
             <div className="w-full text-center gap-4">
-              ₱{
-                (isNaN(parseFloat(newBill.total_amount) / parseFloat(newBill.water_consumed)) ? '0.00' : (parseFloat(newBill.total_amount) / parseFloat(newBill.water_consumed)).toFixed(2))
-              }/ m<sup>3</sup>
-
+            ₱{
+             (isNaN(parseFloat(newBill.total_amount)/parseFloat(newBill.consumed_kwh)) ? '0.00' : (parseFloat(newBill.total_amount)/parseFloat(newBill.consumed_kwh)).toFixed(2))
+             }/ kWh
+              
             </div>
             <DialogFooter>
               <Button type="submit"
-                onClick={handleSaveBill}
+                onClick={handleSaveBill} 
                 disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save room"}
+                {isLoading ? "Saving..." : "Save Bill"}
               </Button>
             </DialogFooter>
           </DialogContent>
