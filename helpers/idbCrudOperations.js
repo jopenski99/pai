@@ -24,6 +24,11 @@ export function openDB() {
                 // Create indexes on the rooms object store here
                 roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
             }
+            if (!db.objectStoreNames.contains('room_billings')) {
+                const roomsStore = db.createObjectStore('room_billings', { keyPath: 'billing_no' });
+                roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
+                roomsStore.createIndex('room_no', 'room_no', { unique: false });
+            }
         };
         request.onsuccess = () => resolve(request.result);
     });

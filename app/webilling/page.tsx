@@ -92,7 +92,7 @@ export default function Webilling() {
   }
 
   return (
-    <div className="grid grid-rows-[auto_1fr_auto] items-start justify-items-center min-h-screen p-8 pb-20 gap-4 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[auto_1fr_auto] items-start justify-items-center h-dvh p-8 pb-20 gap-4 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <header className="w-full ">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <WaterBillCard />
@@ -104,7 +104,7 @@ export default function Webilling() {
           className="w-full p-2  border border-gray-300 rounded-md"
         />
       </header>
-      <main className="w-full  grid-cols-1 gap-4 h-9/9" style={{height: '450px', paddingBottom: '10px',paddingRight: '5px',overflow: 'auto'}} >
+      <main className="w-full  grid-cols-1 gap-4 h-9/9" style={{height: '435px', paddingBottom: '10px',paddingRight: '5px',overflow: 'auto'}} >
 
 
         {roomsList.map((room, index) => (

@@ -26,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
+
       <body>
         <ThemeProvider
           attribute="class"
@@ -33,7 +34,18 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <div className="flex flex-col">
+            <div className="topbar fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-black text-primary-foreground">
+              <div className="logo flex items-center gap-2">
+                <img src="/icon512_rounded.png" alt="Logo" className="h-8 w-8" />
+                <span className="text-lg font-bold text-white">Metro billing</span>
+              </div>
+            </div>
+            <div className="flex flex-row flex-wrap gap-2 fixed top-10">
+              {children}
+            </div>
+          </div>
+
         </ThemeProvider>
       </body>
     </html>
