@@ -1,4 +1,4 @@
-import {openDB} from '../idbCrudOperations';
+import {openDB, ensureIndex} from '../idbCrudOperations';
 
 export const energyBillingTable = {
   name: 'apt_electricity_bills',
@@ -13,7 +13,6 @@ export const energyBillingTable = {
   
   isInitialized: async () => {
     const db = await openDB();
-    console.log(db)
     return {isInit :db.objectStoreNames.contains(energyBillingTable.name), dbIn: db};
   },
   init: (db) => {

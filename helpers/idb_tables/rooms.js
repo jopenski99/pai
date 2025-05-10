@@ -10,7 +10,6 @@ export const roomsTable = {
     
   isInitialized: async () => {
     const db = await openDB();
-    console.log(db)
     return {isInit :db.objectStoreNames.contains(roomsTable.name), dbIn: db};
   },
   init: (db) => {

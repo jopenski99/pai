@@ -1,4 +1,4 @@
-const dbVersion = 1;
+const dbVersion = 3;
 const dbName = 'PAI_DB';
 const storeName = 'Pai Store';
 
@@ -8,7 +8,7 @@ export function openDB() {
         const request = indexedDB.open(dbName, dbVersion);
         request.onerror = () => reject(request.error);
         request.onupgradeneeded = (event) => {
-            const db = event.target.result;     
+            const db = event.target.result;
             if (!db.objectStoreNames.contains('rooms')) {
                 const roomsStore = db.createObjectStore('rooms', { keyPath: 'room_no' });
                 // Create indexes on the rooms object store here
@@ -28,10 +28,17 @@ export function openDB() {
                 const roomsStore = db.createObjectStore('room_billings', { keyPath: 'billing_no' });
                 roomsStore.createIndex('billing_no', 'billing_no', { unique: true });
                 roomsStore.createIndex('room_no', 'room_no', { unique: false });
+                roomsStore.createIndex('month_covered', 'month_covered', { unique: false });
             }
         };
         request.onsuccess = () => resolve(request.result);
     });
+}
+
+export function ensureIndex(db, storeName, indexName, keyPath) {
+    if (!db.transaction(storeName).objectStore(indexName)) {
+        db.transaction(storeName, 'versionchange').objectStore(storeName).createIndex(indexName, keyPath, { unique: false });
+    }
 }
 
 // Create a new record

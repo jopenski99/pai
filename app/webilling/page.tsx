@@ -16,6 +16,7 @@ import { BadgeX } from "lucide-react";
 
 import WaterBillCard from "@/components/pui/water-bill-card";
 import EnergyBillCard from "@/components/pui/energy-bill-card";
+import TenantAccordion from "@/app/webilling/_components/TenantAccordion";
 
 import React, { useState, useEffect, useRef } from 'react';
 
@@ -36,13 +37,13 @@ export default function Webilling() {
   const [isLoading, setIsLoading] = useState(false);
 
   const newRoomRef = useRef<iRoom>({} as iRoom);
-
   useEffect(() => {
     (async () => {
       let db = await rooms.isInitialized();
       setRooms(await rooms.getAll(db.dbIn));
     })();
   }, []);
+
 
   const handleDelete = (roomNo: string) => {
     setIsLoading(true);
@@ -108,7 +109,8 @@ export default function Webilling() {
 
 
         {roomsList.map((room, index) => (
-          <div key={index} className="h-15 my-2 flex justify-between items-center p-4 border border-gray-300 rounded-md">
+          <TenantAccordion roomNo={room.room_no} renterName={room.renter_name} key={index} onDelete={handleDelete} />
+        /*   <div key={index} className="h-15 my-2 flex justify-between items-center p-4 border border-gray-300 rounded-md">
             <span>Room {room.room_no} - {room.renter_name}</span>
             <Button
               variant="ghost"
@@ -117,7 +119,7 @@ export default function Webilling() {
             >
               <BadgeX style={{ width: "25px !important", height: "25px !important", color: "red" }} />
             </Button>
-          </div>
+          </div> */
         ))}
       </main>
       <footer className="w-full flex justify-center">
